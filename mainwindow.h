@@ -5,12 +5,15 @@
 #include <QApplication>
 #include <QMenuBar>
 #include <QScrollArea>
+#include "flowlayout.h"
 #include "addnotewindow.h"
+
 class MainWindow : public QMainWindow
 {
 private:
     QScrollArea *scrollArea;
-    QGridLayout *gridlayout;
+    FlowLayout *flowLayout;
+    //QGridLayout *gridlayout;
     QMenuBar *menubar;
     QMenu *menu;
     QAction *addTag;
