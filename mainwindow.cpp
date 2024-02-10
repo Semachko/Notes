@@ -1,4 +1,6 @@
 #include "mainwindow.h"
+#include "note.h"
+#include <QDebug>
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     menubar = this->menuBar();
@@ -11,15 +13,23 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     menu->addAction(addTag);
     menubar->addAction(addNote);
 
-    gridlayout = new QGridLayout();
-    this->setLayout(gridlayout);
+
+
+    QWidget *centralWidget = new QWidget(this);
+    gridlayout = new QGridLayout(centralWidget);
+    centralWidget->setLayout(gridlayout);
+    scrollArea = new QScrollArea(this);
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setWidget(centralWidget);
+    setCentralWidget(scrollArea);
 
     connect(addTag, &QAction::triggered, this, &MainWindow::AddingTag);
     connect(addNote, &QAction::triggered, this, &MainWindow::CreatingNote);
+
 }
 void MainWindow::AddingTag(bool checked)
 {
-    qDebug()<<"clicked";
+
 }
 void MainWindow::CreatingNote(bool checked)
 {
@@ -27,7 +37,10 @@ void MainWindow::CreatingNote(bool checked)
     connect(addNoteWindow, &AddNoteWindow::NoteAdded, this, &MainWindow::AddingNote);
     addNoteWindow->show();
 }
-void MainWindow::AddingNote(AddNoteWindow* window, Note* note)
+void MainWindow::AddingNote(AddNoteWindow* window)
 {
+    Note* newNote = new Note(window->getTitleLineEdit()->text(),window->getTextTextEdit()->toPlainText());
+    gridlayout->addWidget(newNote,gridlayout->count()/4,gridlayout->count()%4);
+    //gridlayout->addWidget(newNote);
     window->close();
 }

@@ -4,10 +4,12 @@
 #include <QGridLayout>
 #include <QApplication>
 #include <QMenuBar>
+#include <QScrollArea>
 #include "addnotewindow.h"
 class MainWindow : public QMainWindow
 {
 private:
+    QScrollArea *scrollArea;
     QGridLayout *gridlayout;
     QMenuBar *menubar;
     QMenu *menu;
@@ -18,7 +20,7 @@ public:
 public slots:
     void AddingTag(bool checked);
     void CreatingNote(bool checked);
-    void AddingNote(AddNoteWindow* window, Note* note);
+    void AddingNote(AddNoteWindow* window);
 };
 
 #endif // MAINWINDOW_H

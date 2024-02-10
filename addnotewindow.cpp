@@ -1,4 +1,6 @@
 #include "addnotewindow.h"
+
+
 AddNoteWindow::AddNoteWindow() : QWidget(nullptr){
     titleLineEdit = new QLineEdit;
     titleLineEdit->setAlignment(Qt::AlignCenter);
@@ -25,8 +27,6 @@ AddNoteWindow::AddNoteWindow() : QWidget(nullptr){
     connect(cancelButton, &QPushButton::clicked, this, [this](){this->close();});
 }
 
-void AddNoteWindow::callNoteAdded()
-{
-    Note* newNote = new Note(titleLineEdit->text(),textTextEdit->toPlainText());
-    emit AddNoteWindow::NoteAdded(this, newNote);
-}
+void AddNoteWindow::callNoteAdded() {  emit AddNoteWindow::NoteAdded(this); }
+QLineEdit *AddNoteWindow::getTitleLineEdit() const { return titleLineEdit; }
+QTextEdit *AddNoteWindow::getTextTextEdit() const { return textTextEdit; }
