@@ -26,24 +26,6 @@ void FlowLayout::addItem(QLayoutItem *item)
     itemList.append(item);
 }
 
-int FlowLayout::horizontalSpacing() const
-{
-    if (m_hSpace >= 0) {
-        return m_hSpace;
-    } else {
-        return smartSpacing(QStyle::PM_LayoutHorizontalSpacing);
-    }
-}
-
-int FlowLayout::verticalSpacing() const
-{
-    if (m_vSpace >= 0) {
-        return m_vSpace;
-    } else {
-        return smartSpacing(QStyle::PM_LayoutVerticalSpacing);
-    }
-}
-
 int FlowLayout::count() const
 {
     return itemList.size();
@@ -65,7 +47,23 @@ Qt::Orientations FlowLayout::expandingDirections() const
 {
     return { };
 }
+int FlowLayout::horizontalSpacing() const
+{
+    if (m_hSpace >= 0) {
+        return m_hSpace;
+    } else {
+        return smartSpacing(QStyle::PM_LayoutHorizontalSpacing);
+    }
+}
 
+int FlowLayout::verticalSpacing() const
+{
+    if (m_vSpace >= 0) {
+        return m_vSpace;
+    } else {
+        return smartSpacing(QStyle::PM_LayoutVerticalSpacing);
+    }
+}
 
 bool FlowLayout::hasHeightForWidth() const
 {

@@ -12,6 +12,7 @@ private:
     QTextBrowser *m_text;
 public:
     explicit Note(const QString title, const QString text, QWidget *parent = nullptr);
+    void paintEvent(QPaintEvent *event) override;
 };
 
 #endif

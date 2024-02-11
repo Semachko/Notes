@@ -13,7 +13,6 @@ class MainWindow : public QMainWindow
 private:
     QScrollArea *scrollArea;
     FlowLayout *flowLayout;
-    //QGridLayout *gridlayout;
     QMenuBar *menubar;
     QMenu *menu;
     QAction *addTag;
