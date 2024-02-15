@@ -21,7 +21,6 @@ public:
 
     AddNoteWindow();
     QLineEdit *getTitleLineEdit() const;
-
     QTextEdit *getTextTextEdit() const;
 
 signals:
