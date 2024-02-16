@@ -4,11 +4,11 @@
 
 QList<QString> Note::alltags = {};
 
-QList<QString> Note::getTags() const {return tags;}
+QList<QString> Note::getTags() const {return tagsList;}
 QLabel *Note::title() const {return m_title;}
 QTextBrowser *Note::text() const {return m_text;}
 
-Note::Note(const QString title, const QString text, QWidget *parent) : QWidget(parent)
+void Note::initWidgets(const QString title, const QString text)
 {
     m_title = new QLabel(title,this);
     m_title->setContentsMargins(15,0,0,5);
@@ -19,35 +19,19 @@ Note::Note(const QString title, const QString text, QWidget *parent) : QWidget(p
     m_text->setPlainText(text);
     m_text->setStyleSheet("color: white; font-size: 11pt; background-color: rgb(60, 60, 60); border: none;");
 
-
     button_delete = new QPushButton("Delete",this);
 
     button_tags = new QToolButton(this);
     button_tags->setText("      Tags        ");
     button_tags->setFixedHeight(24);
-    QMenu *tagsMenu = new QMenu(this);
-    button_tags->setMenu(tagsMenu);
     button_tags->setPopupMode(QToolButton::InstantPopup);
 
-    // ADD DESERIALIZE //
+    tagsMenu = new QMenu(this);
+    button_tags->setMenu(tagsMenu);
+    addTagMenu = new QMenu("Add tag");
+    deleteTagMenu = new QMenu("Delete tag");
 
-    //================//
-
-
-
-    tagsMenu->addSeparator();
-    QMenu* addTagMenu = new QMenu();
-    QMenu* deleteTagMenu = new QMenu();
-    QAction *addAction = tagsMenu->addAction("Add tag");
-    QAction *deleteAction = tagsMenu->addAction("Delete tag");
-
-    addAction->setMenu(addTagMenu);
-    deleteAction->setMenu(deleteTagMenu);
-
-
-
-
-
+    tagsMenu->addAction("All")->setEnabled(false);
 
 
     QHBoxLayout* layout_bottom = new QHBoxLayout();
@@ -55,8 +39,7 @@ Note::Note(const QString title, const QString text, QWidget *parent) : QWidget(p
     layout_bottom->addStretch();
     layout_bottom->addWidget(button_delete);
 
-
-    layout = new QVBoxLayout(this);
+    QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addWidget(m_title);
     layout->addWidget(m_text);
     layout->addItem(layout_bottom);
@@ -66,107 +49,70 @@ Note::Note(const QString title, const QString text, QWidget *parent) : QWidget(p
     setMinimumHeight(330);
 }
 
-Note::Note(const Note &other, QWidget *parent) :QWidget(parent)
+Note::Note(const QString title, const QString text, QWidget *parent) : QWidget(parent)
 {
-    tags = other.tags;
-    m_title = new QLabel(other.m_title->text(), this);
-    m_title->setContentsMargins(15,0,0,5);
-    m_title->setTextInteractionFlags(Qt::TextSelectableByMouse);
-    m_title->setStyleSheet("color: white; font-size: 14pt; font-weight: bold;");
+    initWidgets(title,text);
 
-    m_text = new QTextBrowser(this);
-    m_text->setPlainText(other.m_text->toPlainText());
-    m_text->setStyleSheet("color: white; font-size: 11pt; background-color: rgb(60, 60, 60); border: none;");
+    tagsMenu->addSeparator();
+    tagsMenu->addMenu(addTagMenu);
+    tagsMenu->addMenu(deleteTagMenu);
+}
 
-    button_delete = new QPushButton("Delete",this);
 
-    button_tags = new QToolButton(this);
-    button_tags->setText("      Tags        ");
-    button_tags->setFixedHeight(24);
-    QMenu *tagsMenu = new QMenu(this);
-    button_tags->setMenu(tagsMenu);
-    button_tags->setPopupMode(QToolButton::InstantPopup);
+Note::Note(const Note &other, QWidget *parent) : QWidget(parent)
+{
+    initWidgets(other.m_title->text(),other.m_text->toPlainText());
+
+    tagsList = other.tagsList;
+
+    for(int i=0; i<other.tagsList.size();i++)
+        tagsMenu->addAction(other.tagsList[i]);
 
     tagsMenu->addSeparator();
 
-    QMenu* addTagMenu = new QMenu(tagsMenu);
-    QMenu* deleteTagMenu = new QMenu(tagsMenu);
-    for(int i=0; i<Note::alltags.size();i++)
-        if(!tags.contains(alltags[i]))
-            addTagMenu->addAction(tags[i]);
+    for(int i=0; i<Note::alltags.size();i++){
+        if(!tagsList.contains(alltags[i]))
+            addTagMenu->addAction(tagsList[i]);
+    }
+    for(int i=0; i<tagsList.size();i++){
+        deleteTagMenu->addAction(tagsList[i]);
+    }
 
-    for(int i=0; i<tags.size();i++)
-        deleteTagMenu->addAction(tags[i]);
-
-
-    QHBoxLayout* layout_bottom = new QHBoxLayout();
-    layout_bottom->addWidget(button_tags);
-    layout_bottom->addStretch();
-    layout_bottom->addWidget(button_delete);
+    tagsMenu->addMenu(addTagMenu);
+    tagsMenu->addMenu(deleteTagMenu);
 
 
-    layout = new QVBoxLayout(this);
-    layout->addWidget(m_title);
-    layout->addWidget(m_text);
-    layout->addItem(layout_bottom);
-    layout->setContentsMargins(15, 15, 15, 15);
-
-    setMaximumWidth(270);
-    setMinimumHeight(330);
 }
 
 Note &Note::operator=(const Note &other)
 {
     if (this == &other)
         return *this;
-    delete layout;
     delete m_title;
     delete m_text;
     delete button_delete;
     delete button_tags;
+    delete tagsMenu;
+    delete addTagMenu;
+    delete deleteTagMenu;
 
+    initWidgets(other.m_title->text(),other.m_text->toPlainText());
 
-    tags = other.tags;
-    m_title = new QLabel(other.m_title->text(), this); // Создаем новые объекты
-    m_title->setContentsMargins(15,0,0,5);
-    m_title->setTextInteractionFlags(Qt::TextSelectableByMouse);
-    m_title->setStyleSheet("color: white; font-size: 14pt; font-weight: bold;");
+    tagsList = other.tagsList;
 
-    m_text = new QTextBrowser(this);
-    m_text->setPlainText(other.m_text->toPlainText());
-    m_text->setStyleSheet("color: white; font-size: 11pt; background-color: rgb(60, 60, 60); border: none;");
+    for(int i=0; i<other.tagsList.size();i++)
+        tagsMenu->addAction(other.tagsList[i]);
 
-    button_delete = new QPushButton("Delete",this);
-
-    button_tags = new QToolButton(this);
-    button_tags->setText("      Tags        ");
-    button_tags->setFixedHeight(24);
-
-    QMenu *tagsMenu = new QMenu(this);
-    button_tags->setMenu(tagsMenu);
-    button_tags->setPopupMode(QToolButton::InstantPopup);
     tagsMenu->addSeparator();
-    QMenu* addTagMenu = new QMenu(tagsMenu);
-    QMenu* deleteTagMenu = new QMenu(tagsMenu);
-    for(int i=0; i<alltags.size();i++)
-        if(!tags.contains(alltags[i]))
-            addTagMenu->addAction(tags[i]);
-    for(int i=0; i<tags.size();i++)
-        deleteTagMenu->addAction(tags[i]);
 
-    QHBoxLayout* layout_bottom = new QHBoxLayout();
-    layout_bottom->addWidget(button_tags);
-    layout_bottom->addStretch();
-    layout_bottom->addWidget(button_delete);
+    for(int i=0; i<Note::alltags.size();i++){
+        if(!tagsList.contains(alltags[i]))
+            addTagMenu->addAction(tagsList[i]);
+    }
+    for(int i=0; i<tagsList.size();i++){
+        deleteTagMenu->addAction(tagsList[i]);
+    }
 
-    layout = new QVBoxLayout(this);
-    layout->addWidget(m_title);
-    layout->addWidget(m_text);
-    layout->addItem(layout_bottom);
-    layout->setContentsMargins(15, 15, 15, 15);
-
-    setMaximumWidth(270);
-    setMinimumHeight(330);
 
     return *this;
 }

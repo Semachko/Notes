@@ -13,13 +13,17 @@ class Note : public QWidget {
 public:
     static QList<QString> alltags;
 private:
-    QList<QString> tags;
-    QVBoxLayout* layout;
+    QList<QString> tagsList;
     QLabel* m_title;
     QTextBrowser* m_text;
     QPushButton* button_delete;
     QToolButton* button_tags;
+    QMenu* tagsMenu;
+    QMenu* addTagMenu;
+    QMenu* deleteTagMenu;
+
 public:
+    void initWidgets(const QString title, const QString text);
     explicit Note(const QString title, const QString text, QWidget *parent = nullptr);
     explicit Note(const Note& other, QWidget *parent = nullptr);
     Note& operator=(const Note& other);
