@@ -10,12 +10,14 @@ CONFIG += c++17
 
 SOURCES += \
     main.cpp \
+    addingtagwindow.cpp \
     flowlayout.cpp \
     addnotewindow.cpp \
     mainwindow.cpp \
     note.cpp
 
 HEADERS += \
+    addingtagwindow.h \
     addnotewindow.h \
     flowlayout.h \
     mainwindow.h \

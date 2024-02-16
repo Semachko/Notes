@@ -1,7 +1,7 @@
 #include "note.h"
+#include "mainwindow.h"
 #include <QPalette>
 #include <QPainter>
-
 QList<QString> Note::alltags = {};
 
 QLabel *Note::title() const {return m_title;}
@@ -20,6 +20,8 @@ void Note::initWidgets(const QString title, const QString text)
     m_text->setStyleSheet("color: white; font-size: 11pt; background-color: rgb(60, 60, 60); border: none;");
 
     button_delete = new QPushButton("Delete",this);
+    connect(button_delete, &QPushButton::clicked, this, [this](){qDebug()<<"init signal"; emit Note::DeletingNote(this);});
+    connect(this, &Note::DeletingNote, m_parent, &MainWindow::DeleteNote);
 
     button_tags = new QToolButton(this);
     button_tags->setText("      Tags        ");
@@ -49,7 +51,7 @@ void Note::initWidgets(const QString title, const QString text)
     setMinimumHeight(330);
 }
 
-Note::Note(const QString title, const QString text, QWidget *parent) : QWidget(parent)
+Note::Note(const QString title, const QString text, MainWindow *parent) : QWidget(parent), m_parent(parent)
 {
     initWidgets(title,text);
 
@@ -58,7 +60,7 @@ Note::Note(const QString title, const QString text, QWidget *parent) : QWidget(p
     tagsMenu->addMenu(deleteTagMenu);
 }
 
-Note::Note(const Note &other, QWidget *parent) : QWidget(parent)
+Note::Note(const Note &other, MainWindow *parent) : QWidget(parent)
 {
     initWidgets(other.m_title->text(),other.m_text->toPlainText());
 

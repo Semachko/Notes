@@ -1,5 +1,5 @@
-#ifndef ADDNOTEWINDOW_H
-#define ADDNOTEWINDOW_H
+#ifndef ADDINGTAGWINDOW_H
+#define ADDINGTAGWINDOW_H
 #include <QApplication>
 #include <QWidget>
 #include <QLineEdit>
@@ -7,24 +7,19 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-
-
-class AddNoteWindow : public QWidget
+class AddingTagWindow : public QWidget
 {
     Q_OBJECT
 private:
     QLineEdit *titleLineEdit;
-    QTextEdit *textTextEdit;
     QPushButton *addButton;
     QPushButton *cancelButton;
 public:
-
-    AddNoteWindow();
+    AddingTagWindow();
     QLineEdit *getTitleLineEdit() const;
-    QTextEdit *getTextTextEdit() const;
 
 signals:
-    void NoteAdded(AddNoteWindow* window);
+    void TagAdded(AddingTagWindow* window);
 };
 
-#endif // ADDNOTEWINDOW_H
+#endif // ADDINGTAGWINDOW_H

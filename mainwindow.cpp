@@ -18,13 +18,33 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     label_tags = new QLabel("Tags: ",menubar);
     label_tags->setStyleSheet("QLabel { font-size: 14pt; font-weight: bold; color: rgb(255, 255, 255); }");
 
-    comboBox = new QComboBox(menubar);
+/*  comboBox = new QComboBox(menubar);
     comboBox->setStyleSheet("QComboBox { font-size: 12pt;}");
     comboBox->addItem("All");
     //          MAKE DESERIALIZATION          //
     comboBox->insertSeparator(comboBox->count());
     comboBox->addItem("Add Tag");
-    comboBox->addItem("Delete Tag");
+    comboBox->addItem("Delete Tag");*/
+
+
+    tool_tags = new QToolButton(this);
+    tool_tags->setText("  All   ");
+    tool_tags->setStyleSheet("QToolButton { font-size: 12pt;}");
+    tool_tags->setPopupMode(QToolButton::InstantPopup);
+    menu_tags = new QMenu(tool_tags);
+    tool_tags->setMenu(menu_tags);
+
+    menu_tags->addAction("All");
+    separatorInMenu = menu_tags->addSeparator();
+    addTagButton = new QAction("Add tag");
+    menu_tags->addAction(addTagButton);
+    connect(addTagButton, &QAction::triggered, this, &MainWindow::CreatingTag);
+
+    deleteTagMenu = new QMenu("Delete tag");
+    menu_tags->addMenu(deleteTagMenu);
+
+
+
 
     button_AddNote = new QPushButton("Add",this);
     button_AddNote->setFixedSize(70,34);
@@ -38,7 +58,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     menubarLayout->addLayout(rightmenubar);
 
     leftmenubar->addWidget(label_tags, 0, Qt::AlignLeft);
-    leftmenubar->addWidget(comboBox, 0, Qt::AlignLeft);
+    leftmenubar->addWidget(tool_tags, 0, Qt::AlignLeft);
     leftmenubar->addStretch();
     rightmenubar->addWidget(button_AddNote, 0, Qt::AlignRight);
 
@@ -53,8 +73,104 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     scrollArea->setWidget(centralWidget);
     setCentralWidget(scrollArea);
 
+    tags = new QList<QAction*>;
+    DeserializeTags();
+    ShowTags();
+
+    notes = new QList<Note*>;
     DeserializeNotes();
     ShowNotes();
+}
+
+
+void MainWindow::DeserializeTags()
+{
+    QFile file("tags.json");
+    if(!file.open(QIODevice::ReadOnly)){
+        QMessageBox::critical(nullptr, "Error", "Failed to load tags");
+        return;
+    }
+    QByteArray jsonData = file.readAll();
+    file.close();
+
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData);
+    if(jsonDoc.isNull() || !jsonDoc.isArray()){
+        QMessageBox::critical(nullptr, "Error", "Invalid tags data format."); return; }
+
+    QJsonArray jsonArray = jsonDoc.array();
+    for (const QJsonValue& value : jsonArray) {
+        if (value.isString()) {
+            QAction* newTag = new QAction(value.toString());
+            tags->append(newTag);
+            connect(newTag,&QAction::triggered,this,[this,newTag](){MainWindow::TagChanged(newTag);});
+        }
+        else { QMessageBox::critical(nullptr, "Error", "Error during loading tags."); return; }
+    }
+}
+void MainWindow::ShowTags()
+{
+    for(QAction* tag : *tags)
+        menu_tags->insertAction(separatorInMenu,tag);
+
+}
+void MainWindow::CreatingTag()
+{
+    AddingTagWindow* addingTagWindow = new AddingTagWindow();
+    connect(addingTagWindow, &AddingTagWindow::TagAdded, this, &MainWindow::AddTag);
+    addingTagWindow->show();
+}
+void MainWindow::AddTag(AddingTagWindow* newTagWindow)
+{
+    QString tag = newTagWindow->getTitleLineEdit()->text();
+
+    if ([&]() {
+                for (QAction* action : *tags)
+                    if (action->text() == tag)
+                        return true;
+                return false;
+                }())
+    {
+        QMessageBox::information(nullptr,"Error","There is already tag with the same name.");
+        newTagWindow->close();
+        return;
+    }
+    QAction* new_Tag = new QAction (tag);
+    tags->push_back(new_Tag);
+    newTagWindow->close();
+    SerializeTags();
+}
+void MainWindow::SerializeTags()
+{
+    QJsonArray jsonArray;
+    for (const QAction* tag : *tags)
+        jsonArray.append(tag->text());
+
+    QJsonDocument jsonDoc(jsonArray);
+    QByteArray jsonData = jsonDoc.toJson();
+
+    QFile file("tags.json");
+    if (file.open(QIODevice::WriteOnly)) {
+        file.write(jsonData);
+        file.close();
+    }
+    else QMessageBox::critical(nullptr,"Error","Failed to save tags.");
+}
+void MainWindow::DeleteTag(const QString& tagToDelete)
+{
+
+}
+void MainWindow::TagChanged(QAction* selectedTag)
+{
+    QString tagg = selectedTag->text();
+    if(tagg!="All") {
+        for(int i = 0; i<flowLayout->count(); i++) {
+            Note* note = qobject_cast<Note *>(flowLayout->itemAt(i)->widget());
+            if(note->tagsList.contains(tagg))
+                flowLayout->itemAt(i)->widget()->show();
+            else
+                flowLayout->itemAt(i)->widget()->hide();
+        }
+    }
 }
 
 void MainWindow::DeserializeNotes()
@@ -91,17 +207,16 @@ void MainWindow::DeserializeNotes()
             }
         }
 
-        Note newNote(title, text);
-        newNote.tagsList=tags;
-        notes.push_back(newNote);
+        Note* newNote = new Note(title, text,this);
+        newNote->tagsList=tags;
+        notes->push_back(newNote);
     }
 }
 void MainWindow::ShowNotes()
 {
-    for(int i = 0; i < notes.size() ;i++)
-        flowLayout->addWidget(&notes[i]);
+    for(int i = 0; i < notes->size() ;i++)
+        flowLayout->addWidget((*notes)[i]);
 }
-
 void MainWindow::CreatingNote()
 {
     AddNoteWindow *addNoteWindow = new AddNoteWindow();
@@ -110,21 +225,21 @@ void MainWindow::CreatingNote()
 }
 void MainWindow::AddingNote(AddNoteWindow* window)
 {
-    Note* newNote = new Note(window->getTitleLineEdit()->text(),window->getTextTextEdit()->toPlainText());
+    Note* newNote = new Note(window->getTitleLineEdit()->text(),window->getTextTextEdit()->toPlainText(),this);
     flowLayout->addWidget(newNote);
     window->close();
 
-    SerializeNote(newNote);
+    notes->push_back(newNote);
+    SerializeNotes();
 }
-void MainWindow::SerializeNote(const Note *newnote)
+void MainWindow::SerializeNotes()
 {
-    notes.push_back(*newnote);
     QJsonArray jsonArray;
-    for (const auto& note : notes) {
+    for (const auto& note : *notes) {
         QJsonObject jsonObj;
-        jsonObj["title"] = note.title()->text();
-        jsonObj["text"] = note.text()->toPlainText();
-        jsonObj["tags"] = QJsonArray::fromStringList(note.tagsList);
+        jsonObj["title"] = note->title()->text();
+        jsonObj["text"] = note->text()->toPlainText();
+        jsonObj["tags"] = QJsonArray::fromStringList(note->tagsList);
         jsonArray.append(jsonObj);
     }
     QJsonDocument jsonDoc(jsonArray);
@@ -137,23 +252,18 @@ void MainWindow::SerializeNote(const Note *newnote)
     }
     else QMessageBox::critical(nullptr,"Error","Failed to save note.");
 }
-
-void MainWindow::currentIndexChanged(int index)
+void MainWindow::DeleteNote(Note *noteToDelete)
 {
-    switch(index)
-    {
-    case 0:
-        break;
-    }
+    qDebug()<<"Work.";
+    notes->remove(notes->indexOf(noteToDelete));
+    flowLayout->removeWidget(noteToDelete);
+    noteToDelete->deleteLater();
+    SerializeNotes();
 }
-void MainWindow::AddingTag()
-{
 
-}
-void MainWindow::DeletingTag()
-{
 
-}
+
+
 
 
 

@@ -11,15 +11,22 @@
 #include "note.h"
 #include "flowlayout.h"
 #include "addnotewindow.h"
+#include "addingtagwindow.h"
 
 class MainWindow : public QMainWindow
 {
+
 private:
-    QList<Note> notes;
+    QList<QAction*>* tags;
+    QList<Note*>* notes;
 
     QMenuBar* menubar;
     QLabel* label_tags;
-    QComboBox* comboBox;
+    QToolButton* tool_tags;
+    QMenu* menu_tags;
+    QMenu* deleteTagMenu;
+    QAction* addTagButton;
+    QAction* separatorInMenu;
     QPushButton* button_AddNote;
 
     FlowLayout* flowLayout;
@@ -28,13 +35,20 @@ private:
 public:
     MainWindow(QWidget *parent = nullptr);
 public slots:
-    void AddingTag();
-    void DeletingTag();
+    void CreatingTag();
+    void AddTag(AddingTagWindow* newTag);
+    void DeleteTag(const QString& tagToDelete);
+    void TagChanged(QAction* selectedTag);
+
     void CreatingNote();
     void AddingNote(AddNoteWindow* window);
-    void currentIndexChanged(int index);
+    void DeleteNote(Note* noteToDelete);
 
-    void SerializeNote(const Note* newnote);
+    void SerializeTags();
+    void DeserializeTags();
+    void ShowTags();
+
+    void SerializeNotes();
     void DeserializeNotes();
     void ShowNotes();
 };
