@@ -7,6 +7,7 @@
 #include <QJsonObject>
 #include <QFile>
 #include <QDir>
+#include <QMessageBox>
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     menubar = this->menuBar();
@@ -27,6 +28,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     button_AddNote = new QPushButton("Add",this);
     button_AddNote->setFixedSize(70,34);
+    connect(button_AddNote, &QPushButton::clicked, this, &MainWindow::CreatingNote);
 
 
     menubarLayout = new QHBoxLayout(menubar);
@@ -40,12 +42,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     leftmenubar->addStretch();
     rightmenubar->addWidget(button_AddNote, 0, Qt::AlignRight);
 
-    //menu = new QMenu("Tags",this);
-    //menubar->addMenu(menu);
-
-    //addTag = new QAction("Add tag", this);
-    //menu->addAction(addTag);
-
 
     QWidget *centralWidget = new QWidget(this);
     flowLayout = new FlowLayout(centralWidget, 10, 15, 20);
@@ -57,8 +53,53 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     scrollArea->setWidget(centralWidget);
     setCentralWidget(scrollArea);
 
+    DeserializeNotes();
+    ShowNotes();
+}
 
-    connect(button_AddNote, &QPushButton::clicked, this, &MainWindow::CreatingNote);
+void MainWindow::DeserializeNotes()
+{
+    QFile file("data.json");
+    if (!file.open(QIODevice::ReadOnly)) {
+        QMessageBox::critical(nullptr, "Error", "Failed to load notes.");
+        return;
+    }
+
+    QByteArray jsonData = file.readAll();
+    file.close();
+
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(jsonData);
+    if (jsonDoc.isNull() || !jsonDoc.isArray()) {
+        QMessageBox::critical(nullptr, "Error", "Invalid notes data format."); return; }
+
+    QJsonArray jsonArray = jsonDoc.array();
+
+    for (const QJsonValue& val : jsonArray) {
+        if (!val.isObject()) {
+            QMessageBox::critical(nullptr, "Error", "Invalid notes data format.");
+            return;
+        }
+
+        QJsonObject jsonObj = val.toObject();
+        QString title = jsonObj["title"].toString();
+        QString text = jsonObj["text"].toString();
+        QJsonArray tagsArray = jsonObj["tags"].toArray();
+        QStringList tags;
+        for (const QJsonValue& tagVal : tagsArray) {
+            if (tagVal.isString()) {
+                tags.append(tagVal.toString());
+            }
+        }
+
+        Note newNote(title, text);
+        newNote.tagsList=tags;
+        notes.push_back(newNote);
+    }
+}
+void MainWindow::ShowNotes()
+{
+    for(int i = 0; i < notes.size() ;i++)
+        flowLayout->addWidget(&notes[i]);
 }
 
 void MainWindow::CreatingNote()
@@ -75,7 +116,6 @@ void MainWindow::AddingNote(AddNoteWindow* window)
 
     SerializeNote(newNote);
 }
-
 void MainWindow::SerializeNote(const Note *newnote)
 {
     notes.push_back(*newnote);
@@ -84,7 +124,7 @@ void MainWindow::SerializeNote(const Note *newnote)
         QJsonObject jsonObj;
         jsonObj["title"] = note.title()->text();
         jsonObj["text"] = note.text()->toPlainText();
-        jsonObj["tags"] = QJsonArray::fromStringList(note.getTags());
+        jsonObj["tags"] = QJsonArray::fromStringList(note.tagsList);
         jsonArray.append(jsonObj);
     }
     QJsonDocument jsonDoc(jsonArray);
@@ -95,7 +135,7 @@ void MainWindow::SerializeNote(const Note *newnote)
         file.write(jsonData);
         file.close();
     }
-    else qDebug()<<"error!";
+    else QMessageBox::critical(nullptr,"Error","Failed to save note.");
 }
 
 void MainWindow::currentIndexChanged(int index)
@@ -106,8 +146,6 @@ void MainWindow::currentIndexChanged(int index)
         break;
     }
 }
-
-
 void MainWindow::AddingTag()
 {
 

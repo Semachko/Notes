@@ -11,9 +11,10 @@ class Note : public QWidget {
     Q_OBJECT
 
 public:
-    static QList<QString> alltags;
+    static QStringList alltags;
+
+    QStringList tagsList;
 private:
-    QList<QString> tagsList;
     QLabel* m_title;
     QTextBrowser* m_text;
     QPushButton* button_delete;
@@ -29,7 +30,6 @@ public:
     Note& operator=(const Note& other);
 
     void paintEvent(QPaintEvent *event) override;
-    QList<QString> getTags() const;
     QLabel *title() const;
     QTextBrowser *text() const;
 };

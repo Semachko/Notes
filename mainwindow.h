@@ -35,7 +35,8 @@ public slots:
     void currentIndexChanged(int index);
 
     void SerializeNote(const Note* newnote);
-    //QJsonArray serializeObjects(const QList<MyClass>& objects);
+    void DeserializeNotes();
+    void ShowNotes();
 };
 
 #endif // MAINWINDOW_H

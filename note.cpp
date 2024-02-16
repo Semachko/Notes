@@ -4,9 +4,9 @@
 
 QList<QString> Note::alltags = {};
 
-QList<QString> Note::getTags() const {return tagsList;}
 QLabel *Note::title() const {return m_title;}
 QTextBrowser *Note::text() const {return m_text;}
+
 
 void Note::initWidgets(const QString title, const QString text)
 {
@@ -57,7 +57,6 @@ Note::Note(const QString title, const QString text, QWidget *parent) : QWidget(p
     tagsMenu->addMenu(addTagMenu);
     tagsMenu->addMenu(deleteTagMenu);
 }
-
 
 Note::Note(const Note &other, QWidget *parent) : QWidget(parent)
 {
@@ -117,8 +116,8 @@ Note &Note::operator=(const Note &other)
     return *this;
 }
 
-
-void Note::paintEvent(QPaintEvent *event) {
+void Note::paintEvent(QPaintEvent *event)
+{
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setBrush(QColor(60, 60, 60));
@@ -126,3 +125,8 @@ void Note::paintEvent(QPaintEvent *event) {
     painter.drawRoundedRect(rect(), 13, 13);
     QWidget::paintEvent(event);
 }
+
+
+
+
+
