@@ -15,8 +15,10 @@
 
 class MainWindow : public QMainWindow
 {
+    Q_OBJECT
 public:
     static QList<QAction*>* tags;
+
 private:
     QList<Note*>* notes;
 
@@ -52,6 +54,9 @@ public slots:
     void SerializeNotes();
     void DeserializeNotes();
     void ShowNotes();
+
+signals:
+    void GeneralTagDeleted(const QString& deletedTag);
 };
 
 #endif // MAINWINDOW_H

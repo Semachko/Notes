@@ -181,6 +181,7 @@ void MainWindow::DeleteTag(const QString tagToDelete)
                 tags->remove(i);
         }
         SerializeTags();
+        emit MainWindow::GeneralTagDeleted(tagToDelete);
     }
 }
 void MainWindow::TagChanged(QAction* selectedTag)
@@ -277,7 +278,6 @@ void MainWindow::SerializeNotes()
 }
 void MainWindow::DeleteNote(Note *noteToDelete)
 {
-    qDebug()<<"Work.";
     notes->remove(notes->indexOf(noteToDelete));
     flowLayout->removeWidget(noteToDelete);
     noteToDelete->deleteLater();

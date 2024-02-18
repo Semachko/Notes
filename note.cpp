@@ -23,6 +23,7 @@ void Note::initWidgets(const QString title, const QString text)
     button_delete = new QPushButton("Delete",this);
     connect(button_delete, &QPushButton::clicked, this, [this](){emit Note::DeletingNote(this);});
     connect(this, &Note::DeletingNote, m_parent, &MainWindow::DeleteNote);
+    connect(m_parent, &MainWindow::GeneralTagDeleted, this, &Note::DeleteTag);
 
     button_tags = new QToolButton(this);
     button_tags->setText("      Tags        ");
@@ -103,11 +104,15 @@ void Note::AddTag(const QString& tagToAdd)
 }
 void Note::DeleteTag(const QString& tagToDelete)
 {
-    tagsList.remove(tagsList.indexOf(tagToDelete));
-    for(QAction* action : tagsMenu->actions())
-        if(action->text()==tagToDelete)
+    int indexOfTagToDelete = tagsList.indexOf(tagToDelete);
+    if(indexOfTagToDelete!=-1)
+    {
+        tagsList.remove(indexOfTagToDelete);
+        for(QAction* action : tagsMenu->actions())
+            if(action->text()==tagToDelete)
             { tagsMenu->removeAction(action); break; }
-    m_parent->SerializeNotes();
+        m_parent->SerializeNotes();
+    }
 }
 
 void Note::paintEvent(QPaintEvent *event)
