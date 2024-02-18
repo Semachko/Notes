@@ -15,9 +15,9 @@
 
 class MainWindow : public QMainWindow
 {
-
+public:
+    static QList<QAction*>* tags;
 private:
-    QList<QAction*>* tags;
     QList<Note*>* notes;
 
     QMenuBar* menubar;
@@ -34,10 +34,11 @@ private:
     QScrollArea* scrollArea;
 public:
     MainWindow(QWidget *parent = nullptr);
+
 public slots:
     void CreatingTag();
     void AddTag(AddingTagWindow* newTag);
-    void DeleteTag(const QString& tagToDelete);
+    void DeleteTag(const QString tagToDelete);
     void TagChanged(QAction* selectedTag);
 
     void CreatingNote();

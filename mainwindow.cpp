@@ -8,24 +8,17 @@
 #include <QFile>
 #include <QDir>
 #include <QMessageBox>
+
+QList<QAction*>* MainWindow::tags = nullptr;
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 {
     menubar = this->menuBar();
     menubar->setFixedHeight(51);
     menubar->setStyleSheet("QMenuBar { background-color: rgb(50, 50, 50); }");
 
-
     label_tags = new QLabel("Tags: ",menubar);
     label_tags->setStyleSheet("QLabel { font-size: 14pt; font-weight: bold; color: rgb(255, 255, 255); }");
-
-/*  comboBox = new QComboBox(menubar);
-    comboBox->setStyleSheet("QComboBox { font-size: 12pt;}");
-    comboBox->addItem("All");
-    //          MAKE DESERIALIZATION          //
-    comboBox->insertSeparator(comboBox->count());
-    comboBox->addItem("Add Tag");
-    comboBox->addItem("Delete Tag");*/
-
 
     tool_tags = new QToolButton(this);
     tool_tags->setText("  All   ");
@@ -42,8 +35,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     deleteTagMenu = new QMenu("Delete tag");
     menu_tags->addMenu(deleteTagMenu);
-
-
 
 
     button_AddNote = new QPushButton("Add",this);
@@ -73,7 +64,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     scrollArea->setWidget(centralWidget);
     setCentralWidget(scrollArea);
 
-    tags = new QList<QAction*>;
+
+    MainWindow::tags = new QList<QAction*>;
     DeserializeTags();
     ShowTags();
 
@@ -101,7 +93,7 @@ void MainWindow::DeserializeTags()
     for (const QJsonValue& value : jsonArray) {
         if (value.isString()) {
             QAction* newTag = new QAction(value.toString());
-            tags->append(newTag);
+            MainWindow::tags->append(newTag);
             connect(newTag,&QAction::triggered,this,[this,newTag](){MainWindow::TagChanged(newTag);});
         }
         else { QMessageBox::critical(nullptr, "Error", "Error during loading tags."); return; }
@@ -109,9 +101,23 @@ void MainWindow::DeserializeTags()
 }
 void MainWindow::ShowTags()
 {
-    for(QAction* tag : *tags)
-        menu_tags->insertAction(separatorInMenu,tag);
+    for(QAction* tag : *MainWindow::tags)
+    {
+        if([&](){   for(QAction* tagInMenu : menu_tags->actions())
+                        if(tag->text()==tagInMenu->text())
+                            return false;
+                    return true;}())
+        {
+            QAction* tagInSelectMenu = new QAction(tag->text());
+            tagInSelectMenu->setParent(menu_tags);
+            menu_tags->insertAction(separatorInMenu,tagInSelectMenu);
 
+            QAction* tagInDeleteMenu = new QAction(tag->text());
+            tagInDeleteMenu->setParent(deleteTagMenu);
+            deleteTagMenu->addAction(tagInDeleteMenu);
+            connect(tagInDeleteMenu,&QAction::triggered,this,[this,tagInDeleteMenu](){DeleteTag(tagInDeleteMenu->text());});
+        }
+    }
 }
 void MainWindow::CreatingTag()
 {
@@ -123,26 +129,26 @@ void MainWindow::AddTag(AddingTagWindow* newTagWindow)
 {
     QString tag = newTagWindow->getTitleLineEdit()->text();
 
-    if ([&]() {
-                for (QAction* action : *tags)
+    if ([&](){  for (QAction* action : *MainWindow::tags)
                     if (action->text() == tag)
                         return true;
-                return false;
-                }())
+                return false;}())
     {
         QMessageBox::information(nullptr,"Error","There is already tag with the same name.");
         newTagWindow->close();
         return;
     }
+
     QAction* new_Tag = new QAction (tag);
-    tags->push_back(new_Tag);
+    MainWindow::tags->push_back(new_Tag);
     newTagWindow->close();
+    ShowTags();
     SerializeTags();
 }
 void MainWindow::SerializeTags()
 {
     QJsonArray jsonArray;
-    for (const QAction* tag : *tags)
+    for (const QAction* tag : *MainWindow::tags)
         jsonArray.append(tag->text());
 
     QJsonDocument jsonDoc(jsonArray);
@@ -155,9 +161,27 @@ void MainWindow::SerializeTags()
     }
     else QMessageBox::critical(nullptr,"Error","Failed to save tags.");
 }
-void MainWindow::DeleteTag(const QString& tagToDelete)
+void MainWindow::DeleteTag(const QString tagToDelete)
 {
-
+    QMessageBox::StandardButton reply = QMessageBox::question(this, "Deleting tag", "Are you sure you want to delete tag "+tagToDelete+"?", QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::Yes) {
+        for(QAction* tag : menu_tags->actions())
+        {
+            if(tag->text()==tagToDelete)
+                menu_tags->removeAction(tag);
+        }
+        for(QAction* tag : deleteTagMenu->actions())
+        {
+            if(tag->text()==tagToDelete)
+                deleteTagMenu->removeAction(tag);
+        }
+        for(int i = 0; i<tags->size(); i++)
+        {
+            if((*tags)[i]->text()==tagToDelete)
+                tags->remove(i);
+        }
+        SerializeTags();
+    }
 }
 void MainWindow::TagChanged(QAction* selectedTag)
 {
@@ -207,8 +231,7 @@ void MainWindow::DeserializeNotes()
             }
         }
 
-        Note* newNote = new Note(title, text,this);
-        newNote->tagsList=tags;
+        Note* newNote = new Note(title, text, this, tags);
         notes->push_back(newNote);
     }
 }
@@ -235,7 +258,7 @@ void MainWindow::AddingNote(AddNoteWindow* window)
 void MainWindow::SerializeNotes()
 {
     QJsonArray jsonArray;
-    for (const auto& note : *notes) {
+    for (const Note* note : *notes) {
         QJsonObject jsonObj;
         jsonObj["title"] = note->title()->text();
         jsonObj["text"] = note->text()->toPlainText();
