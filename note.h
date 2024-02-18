@@ -8,6 +8,7 @@
 #include <QPushButton>
 #include <QToolButton>
 #include <QMainWindow>
+#include "addnotewindow.h"
 class MainWindow;
 
 class Note : public QWidget {
@@ -17,6 +18,7 @@ public:
     QStringList tagsList;
 private:
     QLabel* m_title;
+    QPushButton* button_change;
     QTextBrowser* m_text;
     QPushButton* button_delete;
     QToolButton* button_tags;
@@ -39,6 +41,8 @@ public:
     void showTagsToDelete();
     void AddTag(const QString& tagToAdd);
     void DeleteTag(const QString& tagToDelete);
+    void OpenWindowToChangeNote();
+    void ChangeNote(AddNoteWindow* window);
 signals:
     void DeletingNote(Note* noteToDelete);
 };

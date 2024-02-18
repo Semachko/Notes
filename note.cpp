@@ -16,9 +16,14 @@ void Note::initWidgets(const QString title, const QString text)
     m_title->setTextInteractionFlags(Qt::TextSelectableByMouse);
     m_title->setStyleSheet("color: white; font-size: 14pt; font-weight: bold;");
 
+    button_change = new QPushButton("Change",this);
+    button_change->setFixedWidth(60);
+    connect(button_change,&QPushButton::clicked, this, &Note::OpenWindowToChangeNote);
+
     m_text = new QTextBrowser(this);
     m_text->setPlainText(text);
     m_text->setStyleSheet("color: white; font-size: 11pt; background-color: rgb(60, 60, 60); border: none;");
+
     button_delete = new QPushButton("Delete",this);
     connect(button_delete, &QPushButton::clicked, this, [this](){emit Note::DeletingNote(this);});
     connect(this, &Note::DeletingNote, m_parent, &MainWindow::DeleteNote);
@@ -36,19 +41,25 @@ void Note::initWidgets(const QString title, const QString text)
     deleteTagMenu = new QMenu("Delete tag");
     connect(deleteTagMenu, &QMenu::aboutToShow, this, &Note::showTagsToDelete);
 
+    QHBoxLayout* layout_upper = new QHBoxLayout();
+    layout_upper->addWidget(m_title);
+    layout_upper->addStretch();
+    layout_upper->addWidget(button_change);
+
     QHBoxLayout* layout_bottom = new QHBoxLayout();
     layout_bottom->addWidget(button_tags);
     layout_bottom->addStretch();
     layout_bottom->addWidget(button_delete);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->addWidget(m_title);
+    layout->addItem(layout_upper);
     layout->addWidget(m_text);
     layout->addItem(layout_bottom);
     layout->setContentsMargins(15, 15, 15, 15);
 
     setMaximumWidth(270);
     setMinimumHeight(330);
+
 }
 Note::Note(const QString title, const QString text, MainWindow *parent, const QStringList tags_List)
     : QWidget(parent),
@@ -64,6 +75,26 @@ Note::Note(const QString title, const QString text, MainWindow *parent, const QS
     separatorInMenu = tagsMenu->addSeparator();
     tagsMenu->addMenu(addTagMenu);
     tagsMenu->addMenu(deleteTagMenu);
+}
+
+
+
+void Note::OpenWindowToChangeNote()
+{
+    AddNoteWindow *changeNoteWindow = new AddNoteWindow();
+    connect(changeNoteWindow, &AddNoteWindow::NoteAdded, this, &Note::ChangeNote);
+    changeNoteWindow->titleLineEdit->setText(m_title->text());
+    changeNoteWindow->textTextEdit->setText(m_text->toPlainText());
+    changeNoteWindow->show();
+}
+
+void Note::ChangeNote(AddNoteWindow *window)
+{
+    m_title->setText(window->titleLineEdit->text());
+    m_text->setText(window->textTextEdit->toPlainText());
+    window->close();
+
+    m_parent->SerializeNotes();
 }
 
 void Note::showTagsToAdd()
@@ -112,6 +143,7 @@ void Note::DeleteTag(const QString& tagToDelete)
         m_parent->SerializeNotes();
     }
 }
+
 
 void Note::paintEvent(QPaintEvent *event)
 {

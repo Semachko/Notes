@@ -265,7 +265,7 @@ void MainWindow::CreatingNote()
 }
 void MainWindow::AddingNote(AddNoteWindow* window)
 {
-    Note* newNote = new Note(window->getTitleLineEdit()->text(),window->getTextTextEdit()->toPlainText(),this);
+    Note* newNote = new Note(window->titleLineEdit->text(),window->textTextEdit->toPlainText(),this);
     flowLayout->addWidget(newNote);
     window->close();
 

@@ -32,6 +32,3 @@ AddNoteWindow::AddNoteWindow() : QWidget(){
     connect(cancelButton, &QPushButton::clicked, this, [this](){this->close();});
 }
 
-//void AddNoteWindow::callNoteAdded() { emit AddNoteWindow::NoteAdded(this); }
-QLineEdit *AddNoteWindow::getTitleLineEdit() const { return titleLineEdit; }
-QTextEdit *AddNoteWindow::getTextTextEdit() const { return textTextEdit; }
