@@ -26,6 +26,14 @@ void FlowLayout::addItem(QLayoutItem *item)
     itemList.append(item);
 }
 
+void FlowLayout::clear()
+{
+    while (count() > 0) {
+        //QLayoutItem *item = takeAt(0);
+        this->removeItem(itemAt(0));
+    }
+}
+
 int FlowLayout::count() const
 {
     return itemList.size();

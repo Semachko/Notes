@@ -19,7 +19,6 @@ void Note::initWidgets(const QString title, const QString text)
     m_text = new QTextBrowser(this);
     m_text->setPlainText(text);
     m_text->setStyleSheet("color: white; font-size: 11pt; background-color: rgb(60, 60, 60); border: none;");
-
     button_delete = new QPushButton("Delete",this);
     connect(button_delete, &QPushButton::clicked, this, [this](){emit Note::DeletingNote(this);});
     connect(this, &Note::DeletingNote, m_parent, &MainWindow::DeleteNote);
@@ -36,9 +35,6 @@ void Note::initWidgets(const QString title, const QString text)
     connect(addTagMenu, &QMenu::aboutToShow, this, &Note::showTagsToAdd);
     deleteTagMenu = new QMenu("Delete tag");
     connect(deleteTagMenu, &QMenu::aboutToShow, this, &Note::showTagsToDelete);
-
-    tagsMenu->addAction("All")->setEnabled(false);
-
 
     QHBoxLayout* layout_bottom = new QHBoxLayout();
     layout_bottom->addWidget(button_tags);
@@ -62,6 +58,7 @@ Note::Note(const QString title, const QString text, MainWindow *parent, const QS
     initWidgets(title,text);
     for(const QString& name_tag : tags_List) {
         QAction* newTag = new QAction(name_tag,tagsMenu);
+        newTag->setEnabled(false);
         tagsMenu->insertAction(separatorInMenu,newTag);
     }
     separatorInMenu = tagsMenu->addSeparator();
@@ -99,6 +96,7 @@ void Note::AddTag(const QString& tagToAdd)
 {
     tagsList.push_back(tagToAdd);
     QAction* newTag = new QAction(tagToAdd,tagsMenu);
+    newTag->setEnabled(false);
     tagsMenu->insertAction(separatorInMenu,newTag);
     m_parent->SerializeNotes();
 }
@@ -120,8 +118,11 @@ void Note::paintEvent(QPaintEvent *event)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setBrush(QColor(60, 60, 60));
-    painter.setPen(Qt::NoPen);
     painter.drawRoundedRect(rect(), 13, 13);
+
+    painter.setPen(QPen(QColor(110, 110, 110), 5));
+    painter.drawRoundedRect(rect().adjusted(1, 1, -1, -1), 13, 13);
+
     QWidget::paintEvent(event);
 }
 

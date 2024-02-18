@@ -18,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     menubar->setStyleSheet("QMenuBar { background-color: rgb(50, 50, 50); }");
 
     label_tags = new QLabel("Tags: ",menubar);
+    label_tags->setContentsMargins(0,0,0,4);
     label_tags->setStyleSheet("QLabel { font-size: 14pt; font-weight: bold; color: rgb(255, 255, 255); }");
 
     tool_tags = new QToolButton(this);
@@ -27,7 +28,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     menu_tags = new QMenu(tool_tags);
     tool_tags->setMenu(menu_tags);
 
-    menu_tags->addAction("All");
+    QAction* tagAll = new QAction("  All   ",menu_tags);
+    menu_tags->addAction(tagAll);
+    connect(tagAll,&QAction::triggered,this,[this,tagAll](){MainWindow::TagChanged(tagAll);});
+
     separatorInMenu = menu_tags->addSeparator();
     addTagButton = new QAction("Add tag");
     menu_tags->addAction(addTagButton);
@@ -54,7 +58,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     rightmenubar->addWidget(button_AddNote, 0, Qt::AlignRight);
 
 
-    QWidget *centralWidget = new QWidget(this);
+    centralWidget = new QWidget(this);
     flowLayout = new FlowLayout(centralWidget, 10, 15, 20);
     centralWidget->setLayout(flowLayout);
     centralWidget->setContentsMargins(10, 10, 10, 10);
@@ -94,7 +98,6 @@ void MainWindow::DeserializeTags()
         if (value.isString()) {
             QAction* newTag = new QAction(value.toString());
             MainWindow::tags->append(newTag);
-            connect(newTag,&QAction::triggered,this,[this,newTag](){MainWindow::TagChanged(newTag);});
         }
         else { QMessageBox::critical(nullptr, "Error", "Error during loading tags."); return; }
     }
@@ -107,16 +110,17 @@ void MainWindow::ShowTags()
                         if(tag->text()==tagInMenu->text())
                             return false;
                     return true;}())
-        {
-            QAction* tagInSelectMenu = new QAction(tag->text());
-            tagInSelectMenu->setParent(menu_tags);
-            menu_tags->insertAction(separatorInMenu,tagInSelectMenu);
+            {
+                QAction* tagInSelectMenu = new QAction(tag->text());
+                tagInSelectMenu->setParent(menu_tags);
+                menu_tags->insertAction(separatorInMenu,tagInSelectMenu);
+                connect(tagInSelectMenu,&QAction::triggered,this,[this,tagInSelectMenu](){MainWindow::TagChanged(tagInSelectMenu);});
 
-            QAction* tagInDeleteMenu = new QAction(tag->text());
-            tagInDeleteMenu->setParent(deleteTagMenu);
-            deleteTagMenu->addAction(tagInDeleteMenu);
-            connect(tagInDeleteMenu,&QAction::triggered,this,[this,tagInDeleteMenu](){DeleteTag(tagInDeleteMenu->text());});
-        }
+                QAction* tagInDeleteMenu = new QAction(tag->text());
+                tagInDeleteMenu->setParent(deleteTagMenu);
+                deleteTagMenu->addAction(tagInDeleteMenu);
+                connect(tagInDeleteMenu,&QAction::triggered,this,[this,tagInDeleteMenu](){DeleteTag(tagInDeleteMenu->text());});
+            }
     }
 }
 void MainWindow::CreatingTag()
@@ -186,16 +190,28 @@ void MainWindow::DeleteTag(const QString tagToDelete)
 }
 void MainWindow::TagChanged(QAction* selectedTag)
 {
+    flowLayout->clear();
     QString tagg = selectedTag->text();
-    if(tagg!="All") {
-        for(int i = 0; i<flowLayout->count(); i++) {
-            Note* note = qobject_cast<Note *>(flowLayout->itemAt(i)->widget());
-            if(note->tagsList.contains(tagg))
-                flowLayout->itemAt(i)->widget()->show();
+
+    if(tagg!="  All   ") {
+        for(auto& note : *notes) {
+            if(note->tagsList.contains(tagg)) {
+                flowLayout->addWidget(note);
+                note->show();
+            }
             else
-                flowLayout->itemAt(i)->widget()->hide();
+                note->hide();
+        }
+
+    }
+    else {
+        for(auto& note : *notes) {
+            flowLayout->addWidget(note);
+            note->show();
         }
     }
+    tool_tags->setText("  "+tagg+"   ");
+
 }
 
 void MainWindow::DeserializeNotes()
@@ -278,10 +294,14 @@ void MainWindow::SerializeNotes()
 }
 void MainWindow::DeleteNote(Note *noteToDelete)
 {
-    notes->remove(notes->indexOf(noteToDelete));
-    flowLayout->removeWidget(noteToDelete);
-    noteToDelete->deleteLater();
-    SerializeNotes();
+    QMessageBox::StandardButton reply = QMessageBox::question(this, "Deleting note", "Are you sure you want to delete note?", QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::Yes) {
+        notes->remove(notes->indexOf(noteToDelete));
+        flowLayout->removeWidget(noteToDelete);
+        noteToDelete->deleteLater();
+        SerializeNotes();
+
+    }
 }
 
 

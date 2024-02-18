@@ -31,6 +31,7 @@ private:
     QAction* separatorInMenu;
     QPushButton* button_AddNote;
 
+    QWidget* centralWidget;
     FlowLayout* flowLayout;
     QHBoxLayout* menubarLayout;
     QScrollArea* scrollArea;
