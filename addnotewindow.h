@@ -7,7 +7,7 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
-
+// Small window to add new Note
 
 class AddNoteWindow : public QWidget
 {
@@ -20,6 +20,7 @@ public:
     QTextEdit *textTextEdit;
     AddNoteWindow();
 signals:
+    //Signal to notify main window that we added note
     void NoteAdded(AddNoteWindow* window);
 };
 

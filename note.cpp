@@ -9,6 +9,7 @@ QLabel *Note::title() const {return m_title;}
 QTextBrowser *Note::text() const {return m_text;}
 
 
+//Method to initialize constructors
 void Note::initWidgets(const QString title, const QString text)
 {
     m_title = new QLabel(title,this);
@@ -34,6 +35,18 @@ void Note::initWidgets(const QString title, const QString text)
     button_tags->setFixedHeight(24);
     button_tags->setPopupMode(QToolButton::InstantPopup);
 
+    // Menu that containg list of notes, and option to add and delete tag from note:
+    /*
+    Tags:
+        <tag>
+        <tag>
+        ...
+        AddTag
+        DeleteTag:
+                <tag>
+                <tag>
+                ...
+    */
     tagsMenu = new QMenu(this);
     button_tags->setMenu(tagsMenu);
     addTagMenu = new QMenu("Add tag");
@@ -66,7 +79,10 @@ Note::Note(const QString title, const QString text, MainWindow *parent, const QS
     tagsList(tags_List),
     m_parent(parent)
 {
+    //Calling method to initialize constructor
     initWidgets(title,text);
+
+    //Filling tagsMenu with tags
     for(const QString& name_tag : tags_List) {
         QAction* newTag = new QAction(name_tag,tagsMenu);
         newTag->setEnabled(false);
@@ -78,7 +94,7 @@ Note::Note(const QString title, const QString text, MainWindow *parent, const QS
 }
 
 
-
+// Opens window to change note`s text
 void Note::OpenWindowToChangeNote()
 {
     AddNoteWindow *changeNoteWindow = new AddNoteWindow();
@@ -87,7 +103,6 @@ void Note::OpenWindowToChangeNote()
     changeNoteWindow->textTextEdit->setText(m_text->toPlainText());
     changeNoteWindow->show();
 }
-
 void Note::ChangeNote(AddNoteWindow *window)
 {
     m_title->setText(window->titleLineEdit->text());
@@ -96,12 +111,14 @@ void Note::ChangeNote(AddNoteWindow *window)
 
     m_parent->SerializeNotes();
 }
-
+// Method to show tags that note does not have
+// Tags in addTagMenu are shown dynamically
 void Note::showTagsToAdd()
 {
     addTagMenu->clear();
     for(const QAction* tag : *MainWindow::tags)
     {
+        //Checking is tagsList variable does not contain specific tag from general tags varibale
         if(!tagsList.contains(tag->text()))
         {
             QAction* tagToAdd = new QAction(tag->text(),addTagMenu);
@@ -110,6 +127,8 @@ void Note::showTagsToAdd()
         }
     }
 }
+// Method to show curent note`s tags in menu, so you can delete it
+// Tags in deleteTagMenu are shown dynamically
 void Note::showTagsToDelete()
 {
     deleteTagMenu->clear();
@@ -123,6 +142,7 @@ void Note::showTagsToDelete()
         }
     }
 }
+// Adding tag to note
 void Note::AddTag(const QString& tagToAdd)
 {
     tagsList.push_back(tagToAdd);
@@ -131,6 +151,7 @@ void Note::AddTag(const QString& tagToAdd)
     tagsMenu->insertAction(separatorInMenu,newTag);
     m_parent->SerializeNotes();
 }
+// Deleting tag from note
 void Note::DeleteTag(const QString& tagToDelete)
 {
     int indexOfTagToDelete = tagsList.indexOf(tagToDelete);
@@ -144,14 +165,16 @@ void Note::DeleteTag(const QString& tagToDelete)
     }
 }
 
-
+// Drowing notes
 void Note::paintEvent(QPaintEvent *event)
 {
+    //Drowing background
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing);
     painter.setBrush(QColor(60, 60, 60));
     painter.drawRoundedRect(rect(), 13, 13);
 
+    // Drowing border
     painter.setPen(QPen(QColor(110, 110, 110), 5));
     painter.drawRoundedRect(rect().adjusted(1, 1, -1, -1), 13, 13);
 

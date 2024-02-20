@@ -2,6 +2,10 @@
 #include <QWidget>
 #include <QSizePolicy>
 
+//
+// FlowLayout copied from  https://doc.qt.io/qt-6/qtwidgets-layouts-flowlayout-example.html
+//
+
 FlowLayout::FlowLayout(QWidget *parent, int margin, int hSpacing, int vSpacing)
     : QLayout(parent), m_hSpace(hSpacing), m_vSpace(vSpacing)
 {
@@ -26,10 +30,10 @@ void FlowLayout::addItem(QLayoutItem *item)
     itemList.append(item);
 }
 
+//Removing all items from layout
 void FlowLayout::clear()
 {
     while (count() > 0) {
-        //QLayoutItem *item = takeAt(0);
         this->removeItem(itemAt(0));
     }
 }

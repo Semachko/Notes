@@ -7,6 +7,8 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+// Small window to add new general tag
+
 class AddingTagWindow : public QWidget
 {
     Q_OBJECT
@@ -19,6 +21,7 @@ public:
     QLineEdit *getTitleLineEdit() const;
 
 signals:
+    //Signal to notify main window that we added tag
     void TagAdded(AddingTagWindow* window);
 };
 

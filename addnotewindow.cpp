@@ -1,5 +1,8 @@
 #include "addnotewindow.h"
 
+//
+// Small window to add new Note
+//
 
 AddNoteWindow::AddNoteWindow() : QWidget(){
     titleLineEdit = new QLineEdit;

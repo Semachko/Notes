@@ -21,6 +21,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     label_tags->setContentsMargins(0,0,0,4);
     label_tags->setStyleSheet("QLabel { font-size: 14pt; font-weight: bold; color: rgb(255, 255, 255); }");
 
+    //Main ToolButton in which you can select, add and delete a tag
     tool_tags = new QToolButton(this);
     tool_tags->setText("  All   ");
     tool_tags->setStyleSheet("QToolButton { font-size: 12pt;}");
@@ -28,24 +29,29 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     menu_tags = new QMenu(tool_tags);
     tool_tags->setMenu(menu_tags);
 
+    //Tag that shows all notes
     QAction* tagAll = new QAction("  All   ",menu_tags);
     menu_tags->addAction(tagAll);
     connect(tagAll,&QAction::triggered,this,[this,tagAll](){MainWindow::TagChanged(tagAll);});
 
     separatorInMenu = menu_tags->addSeparator();
+    //Button that opens a AddingTagWindow to add a new tag
     addTagButton = new QAction("Add tag");
     menu_tags->addAction(addTagButton);
     connect(addTagButton, &QAction::triggered, this, &MainWindow::CreatingTag);
 
+    //Menu with all general tags, where you can select tag to delete
     deleteTagMenu = new QMenu("Delete tag");
     menu_tags->addMenu(deleteTagMenu);
 
-
+    //Button that opens Note-Window to add a new note
     button_AddNote = new QPushButton("Add",this);
     button_AddNote->setFixedSize(70,34);
     connect(button_AddNote, &QPushButton::clicked, this, &MainWindow::CreatingNote);
 
 
+    //
+    // Layouts: ...
     menubarLayout = new QHBoxLayout(menubar);
     QHBoxLayout* leftmenubar = new QHBoxLayout(menubar);
     QHBoxLayout* rightmenubar = new QHBoxLayout(menubar);
@@ -69,10 +75,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     setCentralWidget(scrollArea);
 
 
+    //Deserializing tags and notes from files
+    //Showing tags and notes in relevant areas
     MainWindow::tags = new QList<QAction*>;
     DeserializeTags();
     ShowTags();
-
     notes = new QList<Note*>;
     DeserializeNotes();
     ShowNotes();
@@ -104,8 +111,11 @@ void MainWindow::DeserializeTags()
 }
 void MainWindow::ShowTags()
 {
+    // Loop going through all general tags
     for(QAction* tag : *MainWindow::tags)
     {
+        // Checking if there is already a corresponding tag in menu_tags.
+        // In case there is no corresponding tag, we are adding this tag to menu_tags and to deleteTagMenu.
         if([&](){   for(QAction* tagInMenu : menu_tags->actions())
                         if(tag->text()==tagInMenu->text())
                             return false;
@@ -123,6 +133,7 @@ void MainWindow::ShowTags()
             }
     }
 }
+// Opens new window to add a new tag
 void MainWindow::CreatingTag()
 {
     AddingTagWindow* addingTagWindow = new AddingTagWindow();
@@ -133,6 +144,7 @@ void MainWindow::AddTag(AddingTagWindow* newTagWindow)
 {
     QString tag = newTagWindow->getTitleLineEdit()->text();
 
+    // Checking if there is already a corresponding tag with the same name.
     if ([&](){  for (QAction* action : *MainWindow::tags)
                     if (action->text() == tag)
                         return true;
@@ -165,6 +177,7 @@ void MainWindow::SerializeTags()
     }
     else QMessageBox::critical(nullptr,"Error","Failed to save tags.");
 }
+
 void MainWindow::DeleteTag(const QString tagToDelete)
 {
     QMessageBox::StandardButton reply = QMessageBox::question(this, "Deleting tag", "Are you sure you want to delete tag "+tagToDelete+"?", QMessageBox::Yes|QMessageBox::No);
@@ -184,16 +197,20 @@ void MainWindow::DeleteTag(const QString tagToDelete)
             if((*tags)[i]->text()==tagToDelete)
                 tags->remove(i);
         }
+        // Serializing list of tags (becos we deleted one, so it changes)
         SerializeTags();
         emit MainWindow::GeneralTagDeleted(tagToDelete);
     }
 }
+// Showing notes with selected tag
 void MainWindow::TagChanged(QAction* selectedTag)
 {
+    // Clearing whole mainwindow from widgets
     flowLayout->clear();
     QString tagg = selectedTag->text();
 
     if(tagg!="  All   ") {
+        //Adding notes with selected tag to layout and displaying it. Other notes hide
         for(auto& note : *notes) {
             if(note->tagsList.contains(tagg)) {
                 flowLayout->addWidget(note);
@@ -203,7 +220,7 @@ void MainWindow::TagChanged(QAction* selectedTag)
                 note->hide();
         }
 
-    }
+    }// In case we select "All" in tags menu, add all widgets and show it.
     else {
         for(auto& note : *notes) {
             flowLayout->addWidget(note);
@@ -269,6 +286,7 @@ void MainWindow::AddingNote(AddNoteWindow* window)
     flowLayout->addWidget(newNote);
     window->close();
 
+    // Saving new note
     notes->push_back(newNote);
     SerializeNotes();
 }

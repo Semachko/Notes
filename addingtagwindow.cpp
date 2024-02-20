@@ -2,6 +2,9 @@
 
 QLineEdit *AddingTagWindow::getTitleLineEdit() const {  return titleLineEdit; }
 
+//
+// Small window to add new general tag
+//
 
 AddingTagWindow::AddingTagWindow() : QWidget()
 {

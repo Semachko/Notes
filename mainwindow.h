@@ -17,11 +17,16 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 public:
+    // Static variable contains all general tags
     static QList<QAction*>* tags;
 
 private:
+    // Varibale contains all notes
     QList<Note*>* notes;
 
+
+    // Top Menu Bar contains list of tags and button to add a note.
+    // In list of tags you can choose specific tag, add tag and delete tag.
     QMenuBar* menubar;
     QLabel* label_tags;
     QToolButton* tool_tags;
@@ -31,9 +36,11 @@ private:
     QAction* separatorInMenu;
     QPushButton* button_AddNote;
 
+
     QWidget* centralWidget;
     FlowLayout* flowLayout;
     QHBoxLayout* menubarLayout;
+    //ScrollArea, so you can scroll window if there are a lot of notes
     QScrollArea* scrollArea;
 public:
     MainWindow(QWidget *parent = nullptr);
@@ -57,6 +64,7 @@ public slots:
     void ShowNotes();
 
 signals:
+    //Signal to notify all notes that a specific tag has been deleted
     void GeneralTagDeleted(const QString& deletedTag);
 };
 
