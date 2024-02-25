@@ -16,8 +16,8 @@ ____
 
 # **Viewing notes**
 
-<img src="https://github.com/Semachko/Notes/assets/124003664/ad9f6010-e765-4e66-ac2d-4f9565c36c8d" alt="Изображение 1" width="600"/>
-<img src="https://github.com/Semachko/Notes/assets/124003664/43a45eaa-7a49-4f99-9d01-c366af135057" alt="Изображение 2" width="338"/>
+<img src="https://github.com/Semachko/Notes/assets/124003664/ad9f6010-e765-4e66-ac2d-4f9565c36c8d" alt="Изображение 1" width="570"/>
+<img src="https://github.com/Semachko/Notes/assets/124003664/43a45eaa-7a49-4f99-9d01-c366af135057" alt="Изображение 2" width="308"/>
 
 ### *Window resizing is available. The placement of notes automatically adjusts to the size of the window.*
 
