@@ -31,15 +31,15 @@ ____
 ____
 # **Adding general tags**
 
-<img src="https://github.com/Semachko/Notes/assets/124003664/947eeeac-0811-48ca-a162-baf59dd94c8b" alt="Изображение 1" width="238"/>
-<img src="https://github.com/Semachko/Notes/assets/124003664/31f09743-27d8-4de1-8c6c-2b86539524a0" alt="Изображение 2" width="510"/>
+<img src="https://github.com/Semachko/Notes/assets/124003664/947eeeac-0811-48ca-a162-baf59dd94c8b" alt="Изображение 1" width="253"/>
+<img src="https://github.com/Semachko/Notes/assets/124003664/31f09743-27d8-4de1-8c6c-2b86539524a0" alt="Изображение 2" width="495"/>
 
 ### *You can also delete general tags.*
 ____
 # **View tags and add them to notes**
 
 <img src="https://github.com/Semachko/Notes/assets/124003664/b1e11067-5b82-42f9-b45b-c16037a481ff" alt="Изображение 1" width="350"/>
-<img src="https://github.com/Semachko/Notes/assets/124003664/8218f29f-5ba9-4373-b603-e60033d1015e" alt="Изображение 2" width="302"/>
+<img src="https://github.com/Semachko/Notes/assets/124003664/8218f29f-5ba9-4373-b603-e60033d1015e" alt="Изображение 2" width="312"/>
 
 
 ### *You can also remove tags from notes.*
@@ -47,7 +47,7 @@ ____
 ____
 # **Sort notes by tags**
 
-<img src="https://github.com/Semachko/Notes/assets/124003664/8c8fd42f-f27d-4425-86f8-19b5b5830b05" alt="Изображение 1" width="350"/>
+<img src="https://github.com/Semachko/Notes/assets/124003664/8c8fd42f-f27d-4425-86f8-19b5b5830b05" alt="Изображение 1" width="360"/>
 <img src="https://github.com/Semachko/Notes/assets/124003664/66ad0ccb-ee23-46ee-90b5-5cd5fe97fbe7" alt="Изображение 2" width="420"/>
 
 
