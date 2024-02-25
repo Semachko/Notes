@@ -31,7 +31,7 @@ ____
 ____
 # **Adding general tags**
 
-<img src="https://github.com/Semachko/Notes/assets/124003664/947eeeac-0811-48ca-a162-baf59dd94c8b" alt="Изображение 1" width="268"/>
+<img src="https://github.com/Semachko/Notes/assets/124003664/947eeeac-0811-48ca-a162-baf59dd94c8b" alt="Изображение 1" width="275"/>
 <img src="https://github.com/Semachko/Notes/assets/124003664/31f09743-27d8-4de1-8c6c-2b86539524a0" alt="Изображение 2" width="495"/>
 
 ### *You can also delete general tags.*
