@@ -35,3 +35,11 @@ AddNoteWindow::AddNoteWindow() : QWidget(){
     connect(cancelButton, &QPushButton::clicked, this, [this](){this->close();});
 }
 
+AddNoteWindow::~AddNoteWindow()
+{
+    delete addButton;
+    delete cancelButton;
+    delete titleLineEdit;
+    delete textTextEdit;
+}
+

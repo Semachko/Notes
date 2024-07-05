@@ -19,6 +19,7 @@ public:
     QLineEdit *titleLineEdit;
     QTextEdit *textTextEdit;
     AddNoteWindow();
+    ~AddNoteWindow();
 signals:
     //Signal to notify main window that we added note
     void NoteAdded(AddNoteWindow* window);

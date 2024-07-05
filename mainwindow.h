@@ -44,6 +44,7 @@ private:
     QScrollArea* scrollArea;
 public:
     MainWindow(QWidget *parent = nullptr);
+    ~MainWindow();
 
 public slots:
     void CreatingTag();

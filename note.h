@@ -32,7 +32,7 @@ private:
 public:
     void initWidgets(const QString title, const QString text);
     explicit Note(const QString title, const QString text, MainWindow* parent = nullptr, const QStringList tags_List = {});
-
+    ~Note();
     // Copy constructor and operator=
 
     /*explicit Note(const Note& other, MainWindow* parent = nullptr);

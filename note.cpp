@@ -93,6 +93,20 @@ Note::Note(const QString title, const QString text, MainWindow *parent, const QS
     tagsMenu->addMenu(deleteTagMenu);
 }
 
+Note::~Note()
+{
+    delete m_title;
+    delete button_change;
+    delete m_text;
+    delete button_delete;
+    delete button_tags;
+    delete tagsMenu;
+    delete separatorInMenu;
+    delete addTagMenu;
+    delete deleteTagMenu;
+    delete m_parent;
+}
+
 
 // Opens window to change note`s text
 void Note::OpenWindowToChangeNote()

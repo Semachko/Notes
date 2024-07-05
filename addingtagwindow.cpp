@@ -34,7 +34,11 @@ AddingTagWindow::AddingTagWindow() : QWidget()
 
 }
 
-
-
+AddingTagWindow::~AddingTagWindow()
+{
+    delete titleLineEdit;
+    delete addButton;
+    delete cancelButton;
+}
 
 

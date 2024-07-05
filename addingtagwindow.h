@@ -18,6 +18,7 @@ private:
     QPushButton *cancelButton;
 public:
     AddingTagWindow();
+    ~AddingTagWindow();
     QLineEdit *getTitleLineEdit() const;
 
 signals:

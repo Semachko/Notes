@@ -67,6 +67,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     centralWidget = new QWidget(this);
     flowLayout = new FlowLayout(centralWidget, 10, 15, 20);
     centralWidget->setLayout(flowLayout);
+    centralWidget->setLayout(flowLayout);
     centralWidget->setContentsMargins(10, 10, 10, 10);
 
     scrollArea = new QScrollArea(this);
@@ -83,6 +84,23 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     notes = new QList<Note*>;
     DeserializeNotes();
     ShowNotes();
+}
+
+MainWindow::~MainWindow()
+{
+    delete notes;
+    delete menubar;
+    delete label_tags;
+    delete tool_tags;
+    delete menu_tags;
+    delete deleteTagMenu;
+    delete addTagButton;
+    delete separatorInMenu;
+    delete button_AddNote;
+    delete centralWidget;
+    delete flowLayout;
+    delete menubarLayout;
+    delete scrollArea;
 }
 
 
